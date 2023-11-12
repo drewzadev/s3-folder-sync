@@ -1,0 +1,41 @@
+{
+  "name": "s3-folder-sync",
+  "version": "1.0.0",
+  "description": "s3 to local folder sync tool",
+  "main": "s3-folder-sync.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node s3-folder-sync.js",
+    "prepare-for-commit": "grunt",
+    "esbuild": "esbuild s3-folder-sync.js --bundle --platform=node --outfile=dist/s3-folder-sync-bundle.cjs --define:import.meta.url=__dirname",
+    "build-linux-amd64": "pkg --output ./dist/x86/s3-folder-sync.bin --targets node18-linux-x64 dist/s3-folder-sync-bundle.cjs",
+    "build-linux-arm64": "pkg --output ./dist/arm64/s3-folder-sync.bin --targets node18-linux-x64 dist/s3-folder-sync-bundle.cjs",
+    "build-rpm": "chmod u+x ./dist/rhel/build-rpm.sh; /bin/bash ./dist/rhel/build-rpm.sh"
+  },
+  "author": "Andrew Burns",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.395.0",
+    "aws-sdk": "^2.1440.0",
+    "config-ini-parser": "^1.6.1",
+    "fast-safe-stringify": "^2.1.1",
+    "fs-extra": "^11.1.1",
+    "lodash": "^4.17.21",
+    "minimist": "^1.2.8",
+    "openpgp": "^5.11.0",
+    "winston": "^3.10.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.19.5",
+    "grunt": "^1.6.1",
+    "grunt-text-replace": "^0.4.0",
+    "nodemon": "^3.0.1",
+    "pkg": "^5.8.1",
+    "standard": "^17.1.0"
+  }
+}
