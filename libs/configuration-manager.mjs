@@ -12,10 +12,10 @@ export default class ConfigurationManager {
 
   async returnAvailableConfigFilePath () {
     const [localConfigError, localConfigResult] = await __(fs.pathExists(this.localConfigFile))
-    if (localConfigError) {
+    if (localConfigError || !localConfigResult) {
       console.log('Info: Config file not found in local folder. Trying /etc/s3-folder-sync/ ...')
       const [mainConfigError, mainConfigResult] = await __(fs.pathExists(this.mainConfigFile))
-      if (mainConfigError) {
+      if (mainConfigError || !mainConfigResult) {
         throw new Error('Error: No config file found.')
       }
       return this.mainConfigFile
