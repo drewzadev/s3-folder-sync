@@ -50,7 +50,7 @@ const myLogFormatNew = winston.format.combine(
   logLikeFormat
 )
 
-const configFile = '/etc/s3foldersync/s3foldersync.conf'
+const configFile = '/etc/s3-folder-sync/s3foldersync.conf'
 const localConfigFile = './s3foldersync.conf'
 async function main () {
   const configManager = new ConfigurationManager(configFile, localConfigFile)
