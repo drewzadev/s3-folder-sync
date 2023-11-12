@@ -1,5 +1,5 @@
 Name:           s3-folder-sync
-Version:        1.0.1
+Version:        1.0.3
 Release:        1
 Summary:        Syncronise a local folder with an S3 / Object Storage bucket.
 Group:          Applications/Tools
