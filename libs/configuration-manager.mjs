@@ -10,16 +10,16 @@ export default class ConfigurationManager {
     this.delimiter = '\n'
   }
 
-  returnAvailableConfigFilePath () {
-    if (fs.pathExists(this.localConfigFile)) {
-      return this.localConfigFile
-    } else {
-      if (fs.pathExists(this.mainConfigFile)) {
-        return this.mainConfigFile
-      } else {
-        return null
+  async returnAvailableConfigFilePath () {
+    const [localConfigError, localConfigResult] = await __(fs.pathExists(this.localConfigFile))
+    if (localConfigError) {
+      const [mainConfigError, mainConfigResult] = await __(fs.pathExists(this.mainConfigFile))
+      if (mainConfigError) {
+        throw new Error('Error: No config file found.')
       }
+      return this.mainConfigFile
     }
+    return this.localConfigFile
   }
 
   openFile (filePath) {
@@ -47,41 +47,44 @@ export default class ConfigurationManager {
   }
 
   async getConfig () {
-      const parser = new ConfigIniParser.ConfigIniParser(this.delimiter)
-      const configFilePath = this.returnAvailableConfigFilePath()
-      console.log('Info: Using config file: ' + configFilePath)
+    const parser = new ConfigIniParser.ConfigIniParser(this.delimiter)
+    const [configFilePathError, configFilePath] = await __(this.returnAvailableConfigFilePath())
+    if (configFilePathError) {
+      throw new Error(configFilePathError)
+    }
+    console.log('Info: Using config file: ' + configFilePath)
 
-      const [error, result] = await __(this.openFile(configFilePath))
-      if (error) {
-        throw new Error(error)
-      }
+    const [error, result] = await __(this.openFile(configFilePath))
+    if (error) {
+      throw new Error(error)
+    }
 
-      try{
-        parser.parse(result)
-      } catch (error) {
-        throw new Error(error.message)
-      }
+    try{
+      parser.parse(result)
+    } catch (error) {
+      throw new Error(error.message)
+    }
 
-      const pgpPassphrase = parser.getOptionFromDefaultSection('pgpPassphrase', 'null')
-      const bucketSecretKey = parser.getOptionFromDefaultSection('bucketSecretKey', 'null')
-      const bucketAccessKey = parser.getOptionFromDefaultSection('bucketAccessKey', 'null')
-      const bucketEndpoint = parser.getOptionFromDefaultSection('bucketEndpoint', 'null')
-      const bucketRegion = parser.getOptionFromDefaultSection('bucketRegion', 'null')
+    const pgpPassphrase = parser.getOptionFromDefaultSection('pgpPassphrase', 'null')
+    const bucketSecretKey = parser.getOptionFromDefaultSection('bucketSecretKey', 'null')
+    const bucketAccessKey = parser.getOptionFromDefaultSection('bucketAccessKey', 'null')
+    const bucketEndpoint = parser.getOptionFromDefaultSection('bucketEndpoint', 'null')
+    const bucketRegion = parser.getOptionFromDefaultSection('bucketRegion', 'null')
 
-      const pgpPrivateKeyArmored = parser.getOptionFromDefaultSection('pgpPrivateKeyArmored', 'null')
-      const pgpPublicKeyArmored = parser.getOptionFromDefaultSection('pgpPublicKeyArmored', 'null')
+    const pgpPrivateKeyArmored = parser.getOptionFromDefaultSection('pgpPrivateKeyArmored', 'null')
+    const pgpPublicKeyArmored = parser.getOptionFromDefaultSection('pgpPublicKeyArmored', 'null')
 
-      const finalConfig = {
-        pgpPassphrase,
-        bucketSecretKey,
-        bucketAccessKey,
-        bucketEndpoint,
-        bucketRegion,
-        pgpPrivateKeyArmored,
-        pgpPublicKeyArmored
-      }
+    const finalConfig = {
+      pgpPassphrase,
+      bucketSecretKey,
+      bucketAccessKey,
+      bucketEndpoint,
+      bucketRegion,
+      pgpPrivateKeyArmored,
+      pgpPublicKeyArmored
+    }
 
-      return finalConfig
+    return finalConfig
   }
 
   setConfigValue (parser, keyValues) {
