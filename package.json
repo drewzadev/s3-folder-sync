@@ -1,6 +1,6 @@
 {
   "name": "s3-folder-sync",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "s3 to local folder sync tool",
   "main": "s3-folder-sync.js",
   "scripts": {
