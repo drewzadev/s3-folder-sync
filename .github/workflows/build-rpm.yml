@@ -10,7 +10,10 @@ on:
   workflow_dispatch:
 jobs:
   build:
+    name: Build RPM
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       matrix:
         node-version: [18.18.2]
