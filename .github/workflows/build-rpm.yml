@@ -46,4 +46,3 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: ./dist/rpms/*.rpm
-        tag_name: ${{fromJson(steps.set_var.outputs.packageJson).version}}
