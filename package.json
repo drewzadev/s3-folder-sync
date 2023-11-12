@@ -13,6 +13,10 @@
     "build-rpm": "chmod u+x ./dist/rhel/build-rpm.sh; /bin/bash ./dist/rhel/build-rpm.sh"
   },
   "author": "Andrew Burns",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/drewzadev/s3-folder-sync.git"
+  },
   "license": "MIT",
   "private": true,
   "type": "module",
