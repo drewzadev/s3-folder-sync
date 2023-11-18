@@ -23,6 +23,23 @@ s3-folder-sync.bin --mode=download --encrypt=yes --folder=/path/to/local/folder 
 s3-folder-sync.bin --mode=upload --encrypt=no --folder=/path/to/local/folder --bucket=bucket-name
 ```
 
+### Command Line Options ###
+
+These are the available options for s3-folder-sync:
+
+| Option                   | Description                                                                                                                                                                             |
+|--------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| --mode=upload/download   | (Required) This selects the sync direction. --mode=upload would upload the local directory to the bucket. --mode=download would do the opposite.                                        |
+| --encrypt=yes/no         | (Required) This enables or disables PGP file encryption. --encrypt=yes would enable --encrypt=no would disable.                                                                         |
+| --bucket=name            | (Required) This is the name of the bucket you want to upload to or download from in your Object Storage (S3).                                                                           |
+| --folder=/path/to/folder | (Required) This is local folder you want to upload from or download to.                                                                                                                 |
+| --dotFiles=yes/no        | (Optional) Use this with upload mode to include or exclude dot / hidden files.                                                                                                          |
+| --followSymbolicLinks=yes/no        | (Optional) Use this with upload mode to follow symbolic linked files.                                                                                                                   |
+| --filter=*.html          | (Optional) Use this with upload mode to sync only a certain type of file or specific files. This can be set multiple times. Example:<br/>s3-folder-sync --filter=\*.html --filter=\*.js |
+| --exclude=index.html     | (Optional) Use this with upload mode to exclude certain files or types of files. This can be set multiple times. Example:<br/>s3-folder-sync --exclude=\*.html --exclude=readme.md      |
+| --import-key=XXXXXX      | (Optional) Use this option on its own to import a PGP key from a PEM file. Specify the file with full path to import.                                                                   |
+
+
 ### Configuration ###
 
 S3 Folder Sync tool expects the configuration file `s3foldersync.conf` to be present in the same folder as the executable or in `/etc/s3-folder-sync/` folder.
