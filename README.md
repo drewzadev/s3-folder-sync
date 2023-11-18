@@ -75,7 +75,7 @@ pgpPublicKeyArmored=
 
 ### Committing Code ###
 - Before a commit where the Version number is bumped / Tagged, update the package.json version field.
-- Run `npm prepare-for-commit` on the command line to prep the build.
+- Run `npm run-script prepare-for-commit` on the command line to prep the build.
 - All code must be committed to a branch and a pull request created for review.
 - Once the pull request is approved, it can be merged into the main branch.
 
