@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import fs from 'fs-extra'
+import fg from 'fast-glob';
 import __ from './attempt.mjs'
 import S3Bucket from './s3bucket.mjs'
 import PgpEncryption from './pgp-encryption.mjs'
@@ -19,8 +20,8 @@ export default class S3FolderSync {
   start() {
     return new Promise(async (resolve, reject) => {
       this.logger.info('Info: Configuration loaded.')
-      this.checkConfigAndArguments()
 
+      this.checkConfigAndArguments()
       const folder = this.cleanFolderPath(this.config.args.folder)
       const bucketName = this.config.args.bucket
 
@@ -45,7 +46,7 @@ export default class S3FolderSync {
         }
         this.logger.info('Connection to S3 Bucket initialised.')
 
-        const [getDirListError, getDirListResult] = await __(this.getDirectoryList(folder))
+        const [getDirListError, getDirListResult] = await __(this.getDirectoryList(folder, this.config.args.filter, this.config.args.exclude, this.config.args.dotFiles, this.config.args.followSymbolicLinks))
         if (getDirListError) {
           return reject(getDirListError)
         }
@@ -145,6 +146,23 @@ export default class S3FolderSync {
       this.logger.error(`Missing the --folder argument.`)
       argsErrorAndExit = true
     }
+    if (_.isEmpty(this.config.args.dotFiles)) {
+      this.config.args.dotFiles = true
+    } else {
+      this.config.args.dotFiles = this.config.args.dotFiles === 'yes'
+    }
+    if (_.isEmpty(this.config.args.followSymbolicLinks)) {
+      this.config.args.followSymbolicLinks = true
+    } else {
+      this.config.args.followSymbolicLinks = this.config.args.followSymbolicLinks === 'yes'
+    }
+    if (_.isEmpty(this.config.args.filter)) {
+      this.config.args.filter = ['*']
+    }
+    if (_.isEmpty(this.config.args.exclude)) {
+      this.config.args.exclude = []
+    }
+
     if(configErrorAndExit) {
       this.logger.info('The config file should have the following options: \n' +
         'bucketSecretKey=XXXXXX  : (Required) This is the Secret Key or Password for your Object Storage (S3) account. \n' +
@@ -215,24 +233,36 @@ export default class S3FolderSync {
   }
 
   /**
-   * Returns the folder listing for a given path and excludes sub-folders
+   * Returns the folder listing for a given path and excludes sub-folders and ingore File Patterns
+   * This function also allows for dot files and following symbolic links to be enabled or disabled.
    * @param {string} path - Full path of folder
-   * @returns {Promise<void>}
+   * @param {string} filterFilePatterns - An array of glob file patterns to filter by
+   * @param {string} ignoreFilePatterns - An array of glob file patterns to specifically ignore
+   * @param {boolean} showHiddenFiles - Show dot files
+   * @param {boolean} followSymbolicLinks - Follow symbolic links
+   * @returns {Promise<[]>}
    */
-  getDirectoryList (path) {
-    return new Promise(async (resolve, reject) => {
-      fs.readdir(path, { encoding: 'utf8', withFileTypes: true })
-        .then((result) => {
-          if (_.size(result) > 0) {
-            const fileList = this.returnFilePathAndName(path, result)
-            return resolve(fileList)
-          } else {
-            return resolve(null)
-          }
-        }).catch((error) => {
-        throw new Error(error)
-      })
+  async getDirectoryList (path, filterFilePatterns, ignoreFilePatterns, showHiddenFiles, followSymbolicLinks ) {
+    const { glob } = fg
+    const onlyFiles = true
+    const objectMode = true
+    const cwd = path
+    const dot = showHiddenFiles
+    const ignore = ignoreFilePatterns
+    const options = { cwd, dot, onlyFiles, followSymbolicLinks, objectMode, ignore }
+
+    const [error, result] = await __(glob(filterFilePatterns, options))
+    if (error) {
+      throw new Error(error)
+    }
+    if(_.isEmpty(result)) {
+      return null
+    }
+    const dirEntries = _.map(result, (file) => {
+      return file.dirent
     })
+    const fileList = this.returnFilePathAndName(path, dirEntries)
+    return fileList
   }
 
   /**
