@@ -1,0 +1,10 @@
+Source: s3-folder-sync
+Section: admin
+Priority: optional
+Maintainer: Drewzadev <5xdtluer2@mozmail.com>
+Build-Depends: dpkg-dev (>= 1.16.1~), debhelper-compat (= 12), perl:native
+
+Package: s3-folder-sync
+Architecture: arm64
+Depends: openssl
+Description: Syncronise a local folder with an S3 / Object Storage bucket.

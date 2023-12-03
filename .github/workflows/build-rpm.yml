@@ -34,6 +34,8 @@ jobs:
       run: npm ci
     - name: NPM - Build RPM
       run: npm run-script build-rpm
+    - name: NPM - Build DEB
+      run: npm run-script build-deb
     - name: Get package.json version
       id: set_var
       run: |
@@ -45,4 +47,6 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        files: ./dist/rpms/*.rpm
+        files: |
+          ./dist/rpms/*.rpm
+          ./dist/debs/*.deb
