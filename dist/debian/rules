@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+DEB_BUILD_OPTIONS=nostrip
+
+%:
+	dh ${@}
+
+override_dh_installinit:
+	dh_installinit --noscripts
+
+override_dh_builddeb:
+	dh_builddeb -- -Zgzip

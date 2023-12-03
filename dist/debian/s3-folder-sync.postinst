@@ -1,0 +1,37 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+    configure)
+  _DIRECTORY="/etc/s3-folder-sync"
+  if [ ! -e "${_DIRECTORY}" ]
+    then
+      mkdir -p "${_DIRECTORY}"
+      chown root:root ${_DIRECTORY}
+    else
+      echo "s3-folder-sync config directory (${_DIRECTORY}) already exists, leaving folder as is."
+  fi
+
+  _CONFIGFILE="/etc/s3-folder-sync/s3foldersync.conf"
+  if [ ! -e "${_CONFIGFILE}" ]
+    then
+      echo "bucketSecretKey=" > ${_CONFIGFILE}
+      echo "bucketAccessKey=" >> ${_CONFIGFILE}
+      echo "bucketEndpoint=" >> ${_CONFIGFILE}
+      echo "bucketRegion=US" >> ${_CONFIGFILE}
+      echo "pgpPassphrase=" >> ${_CONFIGFILE}
+      echo "pgpPrivateKeyArmored=" >> ${_CONFIGFILE}
+      echo "pgpPublicKeyArmored=" >> ${_CONFIGFILE}
+      chown root:root ${_CONFIGFILE}
+      echo "Created s3-folder-sync config file (${_CONFIGFILE})."
+    else
+      echo "s3-folder-sync config file (${_CONFIGFILE}) already exists, leaving config file as is."
+  fi
+
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0
