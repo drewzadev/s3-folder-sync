@@ -10,7 +10,8 @@
     "esbuild": "esbuild s3-folder-sync.js --bundle --platform=node --outfile=dist/s3-folder-sync-bundle.cjs --define:import.meta.url=__dirname",
     "build-linux-amd64": "pkg --output ./dist/x86/s3-folder-sync.bin --targets node18-linux-x64 dist/s3-folder-sync-bundle.cjs",
     "build-linux-arm64": "pkg --output ./dist/arm64/s3-folder-sync.bin --targets node18-linux-x64 dist/s3-folder-sync-bundle.cjs",
-    "build-rpm": "chmod u+x ./dist/rhel/build-rpm.sh; /bin/bash ./dist/rhel/build-rpm.sh"
+    "build-rpm": "chmod u+x ./dist/rhel/build-rpm.sh; /bin/bash ./dist/rhel/build-rpm.sh",
+    "build-deb": "chmod u+x ./dist/debian/build-deb.sh; /bin/bash ./dist/debian/build-deb.sh"
   },
   "author": "Andrew Burns",
   "repository": {
