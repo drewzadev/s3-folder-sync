@@ -1,9 +1,9 @@
-s3-folder-sync (1.0.8) unstable; urgency=medium, binary-only=yes
+s3-folder-sync (1.1.0) unstable; urgency=medium, binary-only=yes
 
   * New features and bug fixes
- -- drewzadev <5xdtluer2@mozmail.com>  Sun, 03 Dec 2023 13:36:08 +0200
+ -- drewzadev <5xdtluer2@mozmail.com>  Sun, 26 Jan 2025 20:22:25 +0200
 
-s3-folder-sync (1.0.8) unstable; urgency=medium, binary-only=yes
+s3-folder-sync (1.1.0) unstable; urgency=medium, binary-only=yes
 
   * New features and bug fixes
- -- drewzadev <5xdtluer2@mozmail.com>  Sun, 03 Dec 2023 13:36:08 +0200
+ -- drewzadev <5xdtluer2@mozmail.com>  Sun, 26 Jan 2025 20:22:25 +0200
