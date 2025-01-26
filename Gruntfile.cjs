@@ -45,11 +45,35 @@ module.exports = function (grunt) {
             to: '<%= pkg.version %>'
           }]
       },
+    },
+    concat: {
+      options: {
+        separator: '\n\n',
+        process: function (src, filepath) {
+          return '--------- ' + filepath + ' ---------\n' + src
+        }
+      },
+      dist: {
+        src: [
+          's3-folder-sync.js',
+          's3foldersync.conf',
+          'libs/**/*.js',
+          'libs/**/*.mjs',
+          'dist/**/*.*',
+          'package.json',
+          'README.md'
+        ],
+        dest: 'codebase.txt'
+      }
     }
   })
 
   // Load Plugins / Tasks
   grunt.loadNpmTasks('grunt-text-replace')
+  grunt.loadNpmTasks('grunt-contrib-concat')
+
+  // Creates a codebase.txt file to use with AI / LLM tools.
+  grunt.registerTask('create-codebase', ['concat'])
 
   // Default task(s).
   grunt.registerTask('default',

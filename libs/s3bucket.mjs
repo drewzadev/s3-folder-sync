@@ -77,30 +77,31 @@ export default class S3Bucket {
   downloadObject (objectName, bucket) {
     return new Promise(async (resolve, reject) => {
       if(_.isNull(this.s3client)) {
-        throw new Error('S3 Client connection not initialised.')
+        throw new Error('S3 Client connection not initialised.');
       }
       if(_.isEmpty(bucket) || _.isEmpty(objectName)) {
-        throw new Error('Missing argument.')
+        throw new Error('Missing argument.');
       }
       const input = {
         Bucket: bucket,
         Key: objectName,
-      }
+      };
       const command = new GetObjectCommand(input);
-      const [error, result] = await __(this.s3client.send(command))
+      const [error, result] = await __(this.s3client.send(command));
       if (error) {
-        return reject(error)
+        return reject(error);
       }
       if (_.has(result, 'Body') === false) {
-        return reject('Error: Result body is empty.')
+        return reject('Error: Result body is empty.');
       }
 
-      const stream = result.Body
-
-      let contentsBuffer = Buffer.concat(await stream.toArray())
-      const final = contentsBuffer.toString()
-      resolve (final)
-    })
+      const stream = result.Body;
+      const chunks = [];
+      for await (const chunk of stream) {
+        chunks.push(Buffer.from(chunk));
+      }
+      resolve(Buffer.concat(chunks).toString());
+    });
   }
 
   /**

@@ -55,24 +55,21 @@ export default class PgpEncryption {
    * @returns {Promise<unknown>}
    */
   async decryptAndSaveFile(stream, filePath) {
+    const message = await openpgp.readMessage({
+      armoredMessage: stream
+    });
+
     const decryptedMessage = await openpgp.decrypt({
-      message: await openpgp.readMessage({ armoredMessage: stream }),
+      message,
       verificationKeys: this.pgpPublicKey,
-      decryptionKeys: this.pgpPrivateKey
-    })
+      decryptionKeys: this.pgpPrivateKey,
+      format: 'binary'
+    });
 
-    // Openpgp.js has a weird implementation where Uint8Array data is returned as a string
-    // This converts the string back to a Uint8Array Buffer
-    const dataBuffer = Buffer.from(Uint8Array.from(decryptedMessage.data.split(','))).toString('utf8')
+    await fs.writeFile(filePath, Buffer.from(decryptedMessage.data));
 
-    const [writeFileError, writeFileResult] = await __(fs.writeFile(filePath, dataBuffer, {encoding: 'utf8'}))
-    if (writeFileError) {
-      this.logger.error('Error decrypting PGP file: ', writeFileError)
-      throw new Error(writeFileError)
-    }
-
-    this.logger.info('Finish Decrypting and saving file!')
-    return true
+    this.logger.info('Finish Decrypting and saving file!');
+    return true;
   }
 
   /**
@@ -81,28 +78,32 @@ export default class PgpEncryption {
    * @param {string} name - File name
    * @returns {Promise<unknown>}
    */
-  encryptFile(path, name) {
+  async encryptFile(path, name) {
     return new Promise(async (resolve, reject) => {
-      this.logger.info(`Encrypting ${path}/${name}...`)
-      // use fs to read file at filepath and return buffer
-      let readableStream = fs.createReadStream(path + '/' + name)
-      const encrypted = await openpgp.encrypt({
-        message: await openpgp.createMessage({ text: readableStream }),
-        encryptionKeys: this.pgpPublicKey,
-        signingKeys: this.pgpPrivateKey
-      })
-      const pgpName = name + '.pgp'
-      let writeStream = fs.createWriteStream(path + '/' + pgpName, {encoding: 'utf8'})
-      encrypted.pipe(writeStream)
-        .on('finish', () => {
-          this.logger.info(`Successfully encrypted ${path}/${name}`)
-          return resolve({path, name, pgpName})
-        })
-        .on('error', (error) => {
-          this.logger.error(`Error encrypting ${path}/${name}: `, error)
-          return reject(error)
-        })
-    })
+      try {
+        this.logger.info(`Encrypting ${path}/${name}...`);
+
+        // Read file as binary
+        const sourceFilePath = `${path}/${name}`;
+        const fileData = await fs.readFile(sourceFilePath);
+
+        const encrypted = await openpgp.encrypt({
+          message: await openpgp.createMessage({ binary: fileData }), // Use binary mode
+          encryptionKeys: this.pgpPublicKey,
+          signingKeys: this.pgpPrivateKey
+        });
+
+        const pgpName = name + '.pgp';
+        const destFilePath = `${path}/${pgpName}`;
+        await fs.writeFile(destFilePath, encrypted);
+
+        this.logger.info(`Successfully encrypted ${sourceFilePath}`);
+        return resolve({path, name, pgpName});
+      } catch (error) {
+        this.logger.error(`Error encrypting ${path}/${name}: `, error);
+        return reject(error);
+      }
+    });
   }
 
 }
