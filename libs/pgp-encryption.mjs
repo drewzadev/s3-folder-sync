@@ -57,18 +57,18 @@ export default class PgpEncryption {
   async decryptAndSaveFile(stream, filePath) {
     const message = await openpgp.readMessage({
       armoredMessage: stream
-    });
+    })
 
     const decryptedMessage = await openpgp.decrypt({
       message,
       verificationKeys: this.pgpPublicKey,
       decryptionKeys: this.pgpPrivateKey,
       format: 'binary'
-    });
+    })
 
-    await fs.writeFile(filePath, Buffer.from(decryptedMessage.data));
+    await fs.writeFile(filePath, Buffer.from(decryptedMessage.data))
 
-    this.logger.info('Finish Decrypting and saving file!');
+    this.logger.info('Finish Decrypting and saving file!')
     return true;
   }
 
@@ -81,11 +81,11 @@ export default class PgpEncryption {
   async encryptFile(path, name) {
     return new Promise(async (resolve, reject) => {
       try {
-        this.logger.info(`Encrypting ${path}/${name}...`);
+        this.logger.info(`Encrypting ${path}/${name}...`)
 
         // Read file as binary
-        const sourceFilePath = `${path}/${name}`;
-        const fileData = await fs.readFile(sourceFilePath);
+        const sourceFilePath = `${path}/${name}`
+        const fileData = await fs.readFile(sourceFilePath)
 
         const encrypted = await openpgp.encrypt({
           message: await openpgp.createMessage({ binary: fileData }), // Use binary mode
@@ -93,17 +93,17 @@ export default class PgpEncryption {
           signingKeys: this.pgpPrivateKey
         });
 
-        const pgpName = name + '.pgp';
-        const destFilePath = `${path}/${pgpName}`;
-        await fs.writeFile(destFilePath, encrypted);
+        const pgpName = name + '.pgp'
+        const destFilePath = `${path}/${pgpName}`
+        await fs.writeFile(destFilePath, encrypted)
 
-        this.logger.info(`Successfully encrypted ${sourceFilePath}`);
-        return resolve({path, name, pgpName});
+        this.logger.info(`Successfully encrypted ${sourceFilePath}`)
+        return resolve({path, name, pgpName})
       } catch (error) {
-        this.logger.error(`Error encrypting ${path}/${name}: `, error);
+        this.logger.error(`Error encrypting ${path}/${name}: `, error)
         return reject(error);
       }
-    });
+    })
   }
 
 }
