@@ -67,6 +67,15 @@ pgpPublicKeyArmored=
 - `pgpPrivateKeyArmored` : This is the armored private key used to decrypt files. This is an optional field.
 - `pgpPublicKeyArmored` : This is the armored public key used to encrypt files. This is an optional field.
 
+### How to generate pgpPrivateKeyArmored and pgpPublicKeyArmored
+
+This repo comes with a script to generate new private and public armored keys in the correct format.
+Simply run:
+```shell
+node pgp-key-generator.js --name="Your Name" --email="your.email@example.com" --passphrase="your-secure-passphrase"
+```
+
+Copy the contents of the 'pgp-credentials.txt' file to your 's3foldersync.conf' file.
 ## Development ##
 
 ### Versioning ###
